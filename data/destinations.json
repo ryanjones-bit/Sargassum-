@@ -1,0 +1,104 @@
+{
+  "updated": "2026-10-13",
+  "sargassum": {
+    "source": "USF Optical Oceanography Lab, Sargassum Outlook",
+    "bulletinDate": "2026-09-30",
+    "bulletinUrl": "https://optics.marine.usf.edu/projects/SaWS/pdf/Sargassum_outlook_2026_bulletin09_USF.pdf",
+    "regions": {
+      "wcarib": {
+        "label": "Western Caribbean",
+        "rating": "high",
+        "trend": "easing",
+        "note": "Amounts held steady in September and are still above typical levels, but the outlook calls for a decline through the fall."
+      },
+      "ecarib": {
+        "label": "Eastern Caribbean",
+        "rating": "moderate",
+        "trend": "declining",
+        "note": "Amounts dropped sharply in September. Still above typical levels, with beaching expected to be milder than summer."
+      },
+      "atlantic": {
+        "label": "Atlantic-facing islands",
+        "rating": "moderate",
+        "trend": "declining",
+        "note": "The windward (east) coasts catch the most seaweed. Overall amounts are falling heading into late fall."
+      },
+      "bahamas": {
+        "label": "Turks & Caicos / Bahamas",
+        "rating": "low",
+        "trend": "steady",
+        "note": "Outside the main bulletin regions. These islands usually see less sargassum than the Caribbean Sea, though east-facing beaches can still get some."
+      }
+    },
+    "seasonal": ["low", "low", "moderate", "moderate", "high", "high", "high", "high", "moderate", "moderate", "low", "low"]
+  },
+  "destinations": [
+    {
+      "id": "punta-cana",
+      "name": "Punta Cana, Dominican Republic",
+      "lat": 18.58, "lon": -68.40,
+      "holidayCountry": "DO",
+      "basin": "atlantic",
+      "sargassumRegion": "ecarib",
+      "hurricane": ["low", "low", "low", "low", "low", "moderate", "moderate", "high", "high", "high", "moderate", "low"],
+      "crowds": ["high", "high", "high", "moderate", "low", "moderate", "high", "moderate", "low", "low", "moderate", "high"],
+      "note": ""
+    },
+    {
+      "id": "cancun",
+      "name": "Cancún & Riviera Maya, Mexico",
+      "lat": 21.16, "lon": -86.85,
+      "holidayCountry": "MX",
+      "basin": "atlantic",
+      "sargassumRegion": "wcarib",
+      "hurricane": ["low", "low", "low", "low", "low", "moderate", "moderate", "high", "high", "high", "moderate", "low"],
+      "crowds": ["high", "high", "high", "high", "moderate", "moderate", "high", "high", "low", "low", "moderate", "high"],
+      "note": "Isla Mujeres and Cozumel's west side tend to get less seaweed than the main Riviera Maya coast."
+    },
+    {
+      "id": "turks-caicos",
+      "name": "Turks & Caicos",
+      "lat": 21.77, "lon": -72.27,
+      "holidayCountry": "TC",
+      "basin": "atlantic",
+      "sargassumRegion": "bahamas",
+      "hurricane": ["low", "low", "low", "low", "low", "moderate", "moderate", "high", "high", "high", "moderate", "low"],
+      "crowds": ["high", "high", "high", "high", "moderate", "moderate", "moderate", "moderate", "low", "low", "moderate", "high"],
+      "note": "Several resorts close or renovate in September and October. Ask me before booking those months."
+    },
+    {
+      "id": "barbados",
+      "name": "Barbados",
+      "lat": 13.10, "lon": -59.61,
+      "holidayCountry": "BB",
+      "basin": "atlantic",
+      "sargassumRegion": "atlantic",
+      "hurricane": ["low", "low", "low", "low", "low", "moderate", "moderate", "moderate", "high", "moderate", "moderate", "low"],
+      "crowds": ["high", "high", "high", "high", "moderate", "low", "moderate", "moderate", "low", "low", "moderate", "high"],
+      "note": "The calm west coast (Platinum Coast) gets far less seaweed than the east coast."
+    },
+    {
+      "id": "puerto-rico",
+      "name": "Puerto Rico",
+      "lat": 18.47, "lon": -66.11,
+      "holidayCountry": "PR",
+      "holidayFallback": "US",
+      "basin": "atlantic",
+      "sargassumRegion": "ecarib",
+      "hurricane": ["low", "low", "low", "low", "low", "moderate", "moderate", "high", "high", "high", "moderate", "low"],
+      "crowds": ["high", "high", "high", "moderate", "low", "moderate", "high", "moderate", "low", "low", "moderate", "high"],
+      "note": ""
+    },
+    {
+      "id": "maui",
+      "name": "Maui, Hawaii",
+      "lat": 20.69, "lon": -156.44,
+      "holidayCountry": "US",
+      "basin": "pacific",
+      "sargassumRegion": null,
+      "hurricane": ["low", "low", "low", "low", "low", "low", "moderate", "moderate", "moderate", "low", "low", "low"],
+      "crowds": ["high", "high", "high", "moderate", "low", "high", "high", "high", "low", "low", "moderate", "high"],
+      "note": "No sargassum in Hawaii. Winter (Dec to Apr) is whale season and books up early."
+    }
+  ]
+}

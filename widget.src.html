@@ -1,0 +1,174 @@
+<!-- "Is Now a Good Time to Go?" widget — Wandering in Creativity / Ryan Jones, Fora Travel -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#FFEFE3;--card:#FFFAF5;--ink:#2F2A25;--muted:#6E655C;--accent:#94A372;--accent-dk:#6F7D52;--line:#EAD9C8;
+        --low:#94A372;--mod:#D9A441;--high:#C2604A}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg)}
+  .gtc{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);max-width:760px;margin:0 auto;padding:24px 16px 32px}
+  .gtc h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:clamp(28px,5vw,38px);line-height:1.1;margin:0 0 6px}
+  .gtc .sub{color:var(--muted);font-size:15px;margin:0 0 20px}
+  .form{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px}
+  .form label{display:flex;flex-direction:column;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);gap:6px}
+  .form select,.form input{font:inherit;font-size:15px;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-width:0;width:100%}
+  .go{font:inherit;font-weight:600;font-size:15px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:13px 18px;cursor:pointer;width:100%}
+  .go:hover{background:var(--accent-dk)}
+  .err{color:var(--high);font-size:14px;margin:8px 0 0;min-height:1em}
+  .results{margin-top:22px;display:none}
+  .results.show{display:block}
+  .head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .head h3{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;margin:0}
+  .head .dates{color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .card .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+  .card .t{font-weight:600;font-size:15px}
+  .pill{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;color:#fff;white-space:nowrap}
+  .pill.low{background:var(--low)}.pill.moderate{background:var(--mod)}.pill.high{background:var(--high)}.pill.na,.pill.info{background:#A99D90}
+  .card p{margin:0;font-size:14px;line-height:1.5;color:var(--muted)}
+  .card p+p{margin-top:6px}
+  .card a{color:var(--accent-dk)}
+  .credit{font-size:12px!important;font-style:italic}
+  .note{margin-top:10px;background:var(--card);border-left:4px solid var(--accent);border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.5}
+  .cta{margin-top:16px;background:var(--accent);color:#fff;border-radius:14px;padding:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .cta p{margin:0;font-size:15px;line-height:1.45;flex:1 1 260px}
+  .cta a{background:#fff;color:var(--accent-dk);font-weight:600;text-decoration:none;border-radius:10px;padding:11px 16px;white-space:nowrap}
+  .fine{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5}
+  @media (max-width:600px){.form{grid-template-columns:1fr 1fr}.form label:first-child{grid-column:1/-1}.grid{grid-template-columns:1fr}}
+</style>
+
+<div class="gtc">
+  <h2>Is now a good time to go?</h2>
+  <p class="sub">Pick a destination and your dates. You'll get the seaweed, storm, weather, holiday and crowd picture in one place.</p>
+  <div class="form">
+    <label>Destination<select id="gtc-dest"></select></label>
+    <label>Arrive<input type="date" id="gtc-start"></label>
+    <label>Depart<input type="date" id="gtc-end"></label>
+  </div>
+  <button class="go" id="gtc-go">Check my dates</button>
+  <p class="err" id="gtc-err"></p>
+  <div class="results" id="gtc-results"></div>
+</div>
+
+<script>
+(function(){
+  var DATA_URL = "https://raw.githubusercontent.com/ryanjones-bit/sargassum-/main/data/destinations.json";
+  var INTAKE = "https://secure.foratravel.com/intake/iORHzWHAGQ";
+  var FALLBACK = /*FALLBACK_DATA*/null;
+  var DATA = null;
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var LABEL = {low:"Low",moderate:"Moderate",high:"High"};
+  var $ = function(id){return document.getElementById(id)};
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function pill(level,text){return '<span class="pill '+esc(level)+'">'+esc(text||LABEL[level]||level)+'</span>'}
+  function iso(d){return d.toISOString().slice(0,10)}
+  function parse(s){var p=s.split("-");return new Date(Date.UTC(+p[0],+p[1]-1,+p[2]))}
+  function fmt(d){return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
+  function months(a,b){var out=[],d=new Date(Date.UTC(a.getUTCFullYear(),a.getUTCMonth(),1));while(d<=b){out.push(d.getUTCMonth());d.setUTCMonth(d.getUTCMonth()+1)}return out}
+  var RANK={low:0,moderate:1,high:2};
+  function worst(arr,ms){return ms.map(function(m){return arr[m]}).reduce(function(a,b){return RANK[b]>RANK[a]?b:a},"low")}
+  function card(title,level,body,levelText){return '<div class="card"><div class="top"><span class="t">'+title+'</span>'+pill(level,levelText)+'</div>'+body+'</div>'}
+
+  function init(data){
+    DATA=data;
+    $("gtc-dest").innerHTML=data.destinations.map(function(d){return '<option value="'+esc(d.id)+'">'+esc(d.name)+'</option>'}).join("");
+    var t=new Date(),s=new Date(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()+30)),e=new Date(s);e.setUTCDate(e.getUTCDate()+6);
+    $("gtc-start").value=iso(s);$("gtc-end").value=iso(e);
+  }
+
+  fetch(DATA_URL,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(init).catch(function(){
+    if(FALLBACK) init(FALLBACK); else $("gtc-err").textContent="The checker couldn't load right now. Please try again shortly.";
+  });
+
+  // ---- live data ----
+  function weather(dest,a,b){
+    var today=new Date(),soon=(a-today)/864e5<=14&&b>=today;
+    var base="&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto";
+    var calls=[],len=Math.min(Math.round((b-a)/864e5),30);
+    for(var y=1;y<=3;y++){
+      var s=new Date(a);s.setUTCFullYear(a.getUTCFullYear()-y);
+      if(s>=today) s.setUTCFullYear(today.getFullYear()-y);
+      var e=new Date(s);e.setUTCDate(e.getUTCDate()+len);
+      calls.push(fetch("https://archive-api.open-meteo.com/v1/archive?latitude="+dest.lat+"&longitude="+dest.lon+"&start_date="+iso(s)+"&end_date="+iso(e)+base).then(function(r){return r.json()}));
+    }
+    var fc=soon?fetch("https://api.open-meteo.com/v1/forecast?latitude="+dest.lat+"&longitude="+dest.lon+"&forecast_days=16"+base).then(function(r){return r.json()}).catch(function(){return null}):Promise.resolve(null);
+    return Promise.all([Promise.all(calls),fc]).then(function(res){
+      var hi=[],lo=[],wet=0,days=0;
+      res[0].forEach(function(j){if(!j.daily)return;j.daily.temperature_2m_max.forEach(function(v,i){if(v==null)return;hi.push(v);lo.push(j.daily.temperature_2m_min[i]);days++;if(j.daily.precipitation_sum[i]>=0.1)wet++})});
+      if(!days) throw 0;
+      var avg=function(x){return Math.round(x.reduce(function(p,c){return p+c},0)/x.length)};
+      var pct=Math.round(wet/days*100),level=pct>=50?"high":pct>=30?"moderate":"low";
+      var body='<p>Typical highs around <b>'+avg(hi)+'°F</b>, lows around '+avg(lo)+'°F. In the last three years, about <b>'+pct+'%</b> of days in this window had meaningful rain (usually short showers in the tropics).</p>';
+      var f=res[1];
+      if(f&&f.daily){var mx=[],rn=0;f.daily.time.forEach(function(t,i){var d=parse(t);if(d>=a&&d<=b){mx.push(f.daily.temperature_2m_max[i]);if(f.daily.precipitation_sum[i]>=0.1)rn++}});
+        if(mx.length)body+='<p><b>Live forecast:</b> highs near '+avg(mx)+'°F, rain likely on '+rn+' of '+mx.length+' forecast days.</p>'}
+      return card("Weather",level,body,pct+"% rainy days");
+    }).catch(function(){return card("Weather","info",'<p>Weather data is unavailable right now.</p>',"—")});
+  }
+
+  function holidays(dest,a,b){
+    var years=[a.getUTCFullYear()];if(b.getUTCFullYear()!==years[0])years.push(b.getUTCFullYear());
+    function get(cc){return Promise.all(years.map(function(y){return fetch("https://date.nager.at/api/v3/PublicHolidays/"+y+"/"+cc).then(function(r){if(!r.ok||r.status===204)throw 0;return r.json()})})).then(function(x){return [].concat.apply([],x)})}
+    var p=get(dest.holidayCountry);
+    if(dest.holidayFallback) p=p.catch(function(){return get(dest.holidayFallback)});
+    return p.then(function(list){
+      var hits=list.filter(function(h){var d=parse(h.date);return d>=a&&d<=b});
+      var seen={};hits=hits.filter(function(h){var k=h.date+h.name;if(seen[k])return false;seen[k]=1;return true});
+      if(!hits.length) return card("Local holidays","low",'<p>No public holidays fall during your dates.</p>',"None");
+      var body='<p>'+hits.map(function(h){return '<b>'+esc(fmt(parse(h.date)))+'</b>: '+esc(h.localName===h.name?h.name:h.name+' ('+h.localName+')')}).join('<br>')+'</p><p>Expect busier beaches and restaurants, and some local businesses may close.</p>';
+      return card("Local holidays",hits.length>1?"moderate":"low",body,hits.length+(hits.length>1?" holidays":" holiday"));
+    }).catch(function(){return card("Local holidays","info",'<p>Holiday data isn\'t available for this destination yet. I can check for you.</p>',"—")});
+  }
+
+  function storms(dest,ms){
+    var level=worst(dest.hurricane,ms);
+    var txt={low:"Outside the riskiest stretch of the season.",moderate:"Within hurricane season, but not at its peak.",high:"Peak hurricane season. Storms are more likely, so travel insurance with hurricane coverage is a must."}[level];
+    if(dest.basin==="pacific") txt={low:"Hurricanes rarely affect Hawaii, especially this time of year.",moderate:"Central Pacific season is active, though direct hits on Hawaii are rare.",high:txt}[level];
+    var body='<p>'+txt+' This is based on historical odds, not a forecast.</p>';
+    return fetch("https://www.nhc.noaa.gov/CurrentStorms.json").then(function(r){return r.json()}).then(function(j){
+      var st=(j.activeStorms||[]).filter(function(s){return dest.basin==="pacific"?/^CP|^EP/.test(s.id.toUpperCase()):/^AL/.test(s.id.toUpperCase())});
+      body+=st.length?'<p><b>Active right now:</b> '+st.map(function(s){return esc(s.classification+" "+s.name)}).join(", ")+'. <a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener">See NHC</a></p>':'<p>No active storms in this basin right now.</p>';
+      return card("Hurricane risk",level,body);
+    }).catch(function(){return card("Hurricane risk",level,body+'<p><a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener">Live storm tracker (NHC)</a></p>')});
+  }
+
+  function sargassum(dest,a,ms){
+    var S=DATA.sargassum;
+    if(!dest.sargassumRegion) return card("Sargassum","low",'<p>Sargassum isn\'t a concern here.</p>',"Not a factor");
+    var r=S.regions[dest.sargassumRegion],seas=worst(S.seasonal,ms),soon=(a-new Date())/864e5<=60,level=soon?r.rating:seas;
+    var bd=parse(S.bulletinDate);
+    var body=soon?'<p><b>Current outlook ('+esc(r.label)+'):</b> '+esc(r.note)+' Trend: '+esc(r.trend)+'.</p>'
+      :'<p>Your trip is more than two months out, so this rating uses the <b>typical pattern</b> for '+esc(MONTHS[ms[0]])+'. Seaweed usually peaks May to August and is lowest November to February.</p><p><b>Today\'s outlook ('+esc(r.label)+'):</b> '+esc(r.note)+'</p>';
+    body+='<p class="credit">Sargassum data courtesy of the Optical Oceanography Lab, USF College of Marine Science, used with permission. Ratings are general regional outlooks, not beach-specific forecasts. <a href="'+esc(S.bulletinUrl)+'" target="_blank" rel="noopener">See the full outlook</a> (published '+esc(fmt(bd))+').</p>';
+    return Promise.resolve(card("Sargassum",level,body,(soon?"":"Typically ")+LABEL[level]));
+  }
+
+  function crowds(dest,ms){
+    var level=worst(dest.crowds,ms);
+    var txt={low:"Quieter season. Better availability and often better rates.",moderate:"Moderately busy. Book good rooms a few months ahead.",high:"Peak travel time. Popular resorts and upgraded rooms sell out early, so book well ahead."}[level];
+    return Promise.resolve(card("Crowds",level,'<p>'+txt+'</p>'));
+  }
+
+  $("gtc-go").addEventListener("click",function(){
+    $("gtc-err").textContent="";
+    if(!DATA){$("gtc-err").textContent="Still loading. Try again in a second.";return}
+    var dest=DATA.destinations.filter(function(d){return d.id===$("gtc-dest").value})[0];
+    if(!$("gtc-start").value||!$("gtc-end").value){$("gtc-err").textContent="Please choose both dates.";return}
+    var a=parse($("gtc-start").value),b=parse($("gtc-end").value);
+    if(b<a){$("gtc-err").textContent="Your departure date is before your arrival date.";return}
+    var ms=months(a,b),out=$("gtc-results");
+    out.className="results show";
+    out.innerHTML='<p class="sub">Checking your dates…</p>';
+    Promise.all([sargassum(dest,a,ms),storms(dest,ms),weather(dest,a,b),holidays(dest,a,b),crowds(dest,ms)]).then(function(cards){
+      var nights=Math.round((b-a)/864e5);
+      out.innerHTML='<div class="head"><h3>'+esc(dest.name)+'</h3><span class="dates">'+esc(fmt(a))+' – '+esc(fmt(b))+' · '+nights+' night'+(nights===1?'':'s')+'</span></div>'
+        +'<div class="grid">'+cards.join("")+card("Your hotel","info",'<p>Renovations, construction and closed restaurants don\'t show up in any database. I check those directly with hotels before my clients book.</p>',"Ask me")+'</div>'
+        +(dest.note?'<div class="note"><b>Advisor tip:</b> '+esc(dest.note)+'</div>':'')
+        +'<div class="cta"><p>Want me to check your specific hotel and find one with perks like breakfast, resort credits and upgrades? There\'s no planning fee.</p><a href="'+INTAKE+'" target="_blank" rel="noopener">Plan my trip</a></div>'
+        +'<p class="fine">General guidance only, not a guarantee. Ratings are by region and season and can\'t predict conditions on a specific beach or day. Data last updated '+esc(fmt(parse(DATA.updated)))+'. Weather by Open-Meteo · Holidays by Nager.Date · Storms by NOAA NHC.</p>';
+    });
+  });
+})();
+</script>
