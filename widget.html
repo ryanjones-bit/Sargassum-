@@ -94,7 +94,27 @@
     $("gtc-dest").innerHTML=data.destinations.map(function(d){return '<option value="'+esc(d.id)+'">'+esc(d.name)+'</option>'}).join("");
     var t=new Date(),s=new Date(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()+30)),e=new Date(s);e.setUTCDate(e.getUTCDate()+6);
     $("gtc-start").value=iso(s);$("gtc-end").value=iso(e);
+    $("gtc-start").min=iso(new Date(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())));
+    syncEnd(false);
   }
+
+  // Departure can only be picked after arrival. If arrival moves past the
+  // current departure, departure shifts to keep the same trip length (min 1 night).
+  var tripLen=6;
+  function syncEnd(moved){
+    var sv=$("gtc-start").value;if(!sv)return;
+    var a=parse(sv),minEnd=new Date(a);minEnd.setUTCDate(minEnd.getUTCDate()+1);
+    $("gtc-end").min=iso(minEnd);
+    var ev=$("gtc-end").value;
+    if(moved&&(!ev||parse(ev)<=a)){var e=new Date(a);e.setUTCDate(e.getUTCDate()+tripLen);$("gtc-end").value=iso(e)}
+    $("gtc-err").textContent="";
+  }
+  $("gtc-start").addEventListener("change",function(){syncEnd(true)});
+  $("gtc-end").addEventListener("change",function(){
+    var sv=$("gtc-start").value,ev=$("gtc-end").value;if(!sv||!ev)return;
+    var n=Math.round((parse(ev)-parse(sv))/864e5);if(n>=1)tripLen=n;
+    else syncEnd(true);
+  });
 
   fetch(DATA_URL,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(init).catch(function(){
     if(FALLBACK) init(FALLBACK); else $("gtc-err").textContent="The checker couldn't load right now. Please try again shortly.";
@@ -175,7 +195,7 @@
     var dest=DATA.destinations.filter(function(d){return d.id===$("gtc-dest").value})[0];
     if(!$("gtc-start").value||!$("gtc-end").value){$("gtc-err").textContent="Please choose both dates.";return}
     var a=parse($("gtc-start").value),b=parse($("gtc-end").value);
-    if(b<a){$("gtc-err").textContent="Your departure date is before your arrival date.";return}
+    if(b<=a){$("gtc-err").textContent="Please pick a departure date after your arrival date.";return}
     var ms=months(a,b),out=$("gtc-results");
     out.className="results show";
     out.innerHTML='<p class="sub">Checking your dates…</p>';
