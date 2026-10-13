@@ -147,7 +147,7 @@
       out.innerHTML='<div class="head"><h3>'+esc(dest.name)+'</h3><span class="dates">'+esc(fmt(a))+' – '+esc(fmt(b))+' · '+nights+' night'+(nights===1?'':'s')+'</span></div>'
         +'<div class="grid">'+cards.join("")+card("Your hotel","info",'<p>Renovations, construction and closed restaurants don\'t show up in any database. I check those directly with hotels before my clients book.</p>',"Ask me")+'</div>'
         +(dest.note?'<div class="note"><b>Advisor tip:</b> '+esc(dest.note)+'</div>':'')
-        +'<div class="cta"><p>Want me to check your specific hotel and find one with perks like breakfast, resort credits and upgrades? There\'s no planning fee.</p><a href="'+INTAKE+'" target="_blank" rel="noopener">Plan my trip</a></div>'
+        +'<div class="cta"><p>Want me to check your specific hotel and find one with perks like breakfast, resort credits and upgrades? Hotel-only bookings have no planning fee.</p><a href="'+INTAKE+'" target="_blank" rel="noopener">Plan my trip</a></div>'
         +'<p class="fine">General guidance only, not a guarantee. Ratings are by region and season and can\'t predict conditions on a specific beach or day. Data last updated '+esc(fmt(parse(DATA.updated)))+'. Weather by Open-Meteo · Holidays by Nager.Date · Storms by NOAA NHC.</p>';
     });
   });

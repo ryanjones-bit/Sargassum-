@@ -1,14 +1,26 @@
 [
-  {"q": "When is hurricane season in the Caribbean?",
-   "a": "June 1 through November 30. The real peak is mid-August through October. I always recommend travel insurance with hurricane coverage for trips in that window, and I'll tell you which rates are refundable before you book."},
-  {"q": "When is sargassum season?",
-   "a": "It usually builds in spring, peaks in summer, and is lowest from about November through February. It changes a lot from year to year and beach to beach, so I check current conditions before recommending a resort."},
-  {"q": "Which beaches get less sargassum?",
-   "a": "Usually the ones facing away from the open Atlantic. Barbados' west coast, Isla Mujeres and the west side of Cozumel tend to stay clearer than east-facing beaches. Many resorts also clear their beaches every morning, and I know which ones do it well."},
-  {"q": "What's the best time to visit Turks & Caicos?",
-   "a": "December through April is the driest and most popular stretch. September and October are quieter, but some resorts close or renovate then, so ask me before you book those months."},
-  {"q": "How accurate is this checker?",
-   "a": "It's a starting point, not a guarantee. Sargassum ratings are regional outlooks, not beach forecasts. Hurricane risk is based on historical odds, not a forecast. For trips more than two months out, the sargassum rating uses the typical pattern for that month."},
-  {"q": "Does it cost anything to plan with you?",
-   "a": "No. I don't charge planning fees. Hotels and suppliers pay my commission, and booking through me can add perks like breakfast, resort credits and upgrades when available."}
+  {
+    "q": "When is hurricane season in the Caribbean?",
+    "a": "June 1 through November 30. The real peak is mid-August through October. I always recommend travel insurance with hurricane coverage for trips in that window, and I'll tell you which rates are refundable before you book."
+  },
+  {
+    "q": "When is sargassum season?",
+    "a": "It usually builds in spring, peaks in summer, and is lowest from about November through February. It changes a lot from year to year and beach to beach, so I check current conditions before recommending a resort."
+  },
+  {
+    "q": "Which beaches get less sargassum?",
+    "a": "Usually the ones facing away from the open Atlantic. Barbados' west coast, Isla Mujeres and the west side of Cozumel tend to stay clearer than east-facing beaches. Many resorts also clear their beaches every morning, and I know which ones do it well."
+  },
+  {
+    "q": "What's the best time to visit Turks & Caicos?",
+    "a": "December through April is the driest and most popular stretch. September and October are quieter, but some resorts close or renovate then, so ask me before you book those months."
+  },
+  {
+    "q": "How accurate is this checker?",
+    "a": "It's a starting point, not a guarantee. Sargassum ratings are regional outlooks, not beach forecasts. Hurricane risk is based on historical odds, not a forecast. For trips more than two months out, the sargassum rating uses the typical pattern for that month."
+  },
+  {
+    "q": "Does it cost anything to plan with you?",
+    "a": "Not for hotel-only bookings or vacation packages. Those are free to book through me, since hotels and suppliers pay my commission, and you can still get perks like breakfast, resort credits and upgrades when available. Bigger custom trips, like multi-stop itineraries I build out day by day, do have a planning fee. I'll go over it with you before any planning starts."
+  }
 ]
